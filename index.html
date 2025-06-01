@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Find and Replace Text</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+    }
+
+    textarea {
+      width: 80%;
+      height: 200px;
+      background-color: #1e1e1e;
+      color: #ffffff;
+      border: 1px solid #333;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+    }
+
+    input[type="text"] {
+      background-color: #1e1e1e;
+      color: #ffffff;
+      border: 1px solid #333;
+      padding: 0.5rem;
+      margin: 0.5rem;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #333;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Find and Replace</h1>
+  <textarea id="mainText" placeholder="Enter your text here..."></textarea>
+  
+  <div class="input-group">
+    <input type="text" id="findText" placeholder="Find">
+    <input type="text" id="replaceText" placeholder="Replace with">
+  </div>
+  
+  <button onclick="findAndReplace()">Replace</button>
+
+  <script>
+    function findAndReplace() {
+      const textArea = document.getElementById("mainText");
+      const find = document.getElementById("findText").value;
+      const replace = document.getElementById("replaceText").value;
+
+      if (find === "") return;
+
+      const regex = new RegExp(find, "g");
+      textArea.value = textArea.value.replace(regex, replace);
+    }
+  </script>
+</body>
+</html>
