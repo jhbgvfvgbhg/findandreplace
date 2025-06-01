@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Find and Replace Text</title>
+  <title>Persistent Find and Replace</title>
   <style>
     body {
       background-color: #121212;
@@ -27,7 +27,20 @@
       padding: 10px;
       font-size: 1rem;
       border-radius: 5px;
-      margin-bottom: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      width: 60%;
+      margin: 0.5rem 0;
+    }
+
+    .input-wrap {
+      display: flex;
+      flex-direction: column;
+      width: 48%;
     }
 
     input[type="text"] {
@@ -35,53 +48,125 @@
       color: #ffffff;
       border: 1px solid #333;
       padding: 0.5rem;
-      margin: 0.5rem;
       border-radius: 5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
     }
 
     button {
       background-color: #333;
       color: #fff;
       border: none;
-      padding: 0.5rem 1rem;
+      padding: 0.4rem 0.8rem;
       border-radius: 5px;
       cursor: pointer;
-      margin-top: 1rem;
+      flex: 1;
     }
 
     button:hover {
       background-color: #555;
     }
 
-    .input-group {
+    .center {
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
+      width: 100%;
+      margin: 1rem 0 0.5rem 0;
     }
   </style>
 </head>
 <body>
-  <h1>Find and Replace</h1>
+  <h1>Persistent Find and Replace</h1>
+
   <textarea id="mainText" placeholder="Enter your text here..."></textarea>
-  
-  <div class="input-group">
-    <input type="text" id="findText" placeholder="Find">
-    <input type="text" id="replaceText" placeholder="Replace with">
+
+  <!-- Replace Row -->
+  <div class="row">
+    <input type="text" id="replaceText1" placeholder="Replace with this1">
+    <input type="text" id="replaceText2" placeholder="Replace with this2">
   </div>
-  
-  <button onclick="findAndReplace()">Replace</button>
+
+  <!-- Replace Button (unrelated to saved values) -->
+  <div class="center">
+    <button onclick="replaceText()">Replace</button>
+  </div>
+
+  <!-- Find Row with Change + Save buttons -->
+  <div class="row">
+    <div class="input-wrap">
+      <input type="text" id="findText1" placeholder="Find1">
+      <div class="button-group">
+        <button onclick="changeText(1)">Change</button>
+        <button onclick="saveFindReplace(1)">Save</button>
+      </div>
+    </div>
+    <div class="input-wrap">
+      <input type="text" id="findText2" placeholder="Find2">
+      <div class="button-group">
+        <button onclick="changeText(2)">Change</button>
+        <button onclick="saveFindReplace(2)">Save</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    function findAndReplace() {
-      const textArea = document.getElementById("mainText");
-      const find = document.getElementById("findText").value;
-      const replace = document.getElementById("replaceText").value;
+    // Load saved values on page load
+    window.onload = function () {
+      const saved1 = localStorage.getItem("findReplace1");
+      const saved2 = localStorage.getItem("findReplace2");
 
-      if (find === "") return;
+      if (saved1) {
+        const { find, replace } = JSON.parse(saved1);
+        document.getElementById("findText1").value = find;
+        document.getElementById("replaceText1").value = replace;
+      }
+      if (saved2) {
+        const { find, replace } = JSON.parse(saved2);
+        document.getElementById("findText2").value = find;
+        document.getElementById("replaceText2").value = replace;
+      }
+    };
+
+    // Replace using both replaceText fields at once
+    function replaceText() {
+      const textArea = document.getElementById("mainText");
+      let content = textArea.value;
+
+      const find1 = document.getElementById("findText1").value;
+      const find2 = document.getElementById("findText2").value;
+      const replace1 = document.getElementById("replaceText1").value;
+      const replace2 = document.getElementById("replaceText2").value;
+
+      if (find1) content = content.replace(new RegExp(find1, "g"), replace1);
+      if (find2) content = content.replace(new RegExp(find2, "g"), replace2);
+
+      textArea.value = content;
+    }
+
+    // Change button for one pair
+    function changeText(index) {
+      const textArea = document.getElementById("mainText");
+      const find = document.getElementById(`findText${index}`).value;
+      const replace = document.getElementById(`replaceText${index}`).value;
+
+      if (!find) return;
 
       const regex = new RegExp(find, "g");
       textArea.value = textArea.value.replace(regex, replace);
+    }
+
+    // Save find/replace pair to localStorage
+    function saveFindReplace(index) {
+      const find = document.getElementById(`findText${index}`).value;
+      const replace = document.getElementById(`replaceText${index}`).value;
+      const data = { find, replace };
+      localStorage.setItem(`findReplace${index}`, JSON.stringify(data));
+      alert(`Saved Find ${index} & Replace ${index}`);
     }
   </script>
 </body>
